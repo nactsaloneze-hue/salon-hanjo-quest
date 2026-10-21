@@ -100,12 +100,12 @@
       "double-click idempotence",
       "animation lock",
       "PNG save handler with canvas doubles",
-      "storage blocked and invalid save fallback"
+      "storage blocked and invalid save fallback",
+      "unique questions/option sets",
+      "visible decline and cash explanations",
+      "historical finances on review",
+      "stale next/continue guarded"
     ],
     "limitation": "DOM/canvas test doubles; actual browser rendering and real PNG output remain unverified"
-  },
-  "browser": {
-    "status": "not_run",
-    "reason": "Local runtime connection disconnected; no browser tool available. Mobile rendering, actual PNG rasterization and external LINE navigation remain unverified."
   }
 }
