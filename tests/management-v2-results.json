@@ -1,0 +1,111 @@
+{
+  "model": {
+    "seedTrialsPerStrategy": 1000,
+    "position": [
+      {
+        "position": "A",
+        "wins": 119,
+        "failures": 881,
+        "bankrupt": 0
+      },
+      {
+        "position": "B",
+        "wins": 113,
+        "failures": 887,
+        "bankrupt": 2
+      },
+      {
+        "position": "C",
+        "wins": 100,
+        "failures": 900,
+        "bankrupt": 1
+      },
+      {
+        "position": "D",
+        "wins": 97,
+        "failures": 903,
+        "bankrupt": 0
+      }
+    ],
+    "style": [
+      {
+        "strategy": 0,
+        "wins": 0,
+        "bankrupt": 0
+      },
+      {
+        "strategy": 1,
+        "wins": 0,
+        "bankrupt": 0
+      },
+      {
+        "strategy": 2,
+        "wins": 0,
+        "bankrupt": 0
+      },
+      {
+        "strategy": 3,
+        "wins": 0,
+        "bankrupt": 1000
+      }
+    ],
+    "lowBudgetWins": 1000,
+    "randomPaths": 30000,
+    "recoveries": 52,
+    "recoveryExample": {
+      "seed": 1684,
+      "answers": [
+        2,
+        3,
+        3,
+        3,
+        2,
+        3,
+        2,
+        0,
+        3,
+        3,
+        2,
+        0
+      ],
+      "cash": 337500,
+      "reputation": 9
+    },
+    "levels": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "declines": 48723,
+    "checks": [
+      "cash/sales/cost/profit identities",
+      "no guaranteed constant-position or constant-strategy win",
+      "low budget balanced path resilient",
+      "high investment bankruptcy",
+      "prior preparation changes next result",
+      "event seeds repeat through edits",
+      "crisis recovery",
+      "5 building levels and declines"
+    ]
+  },
+  "ui": {
+    "full12QuestionFlows": 24,
+    "gameOverAndRetryFlows": 6,
+    "answerReviewFlows": 24,
+    "checks": [
+      "result and gameover LINE href",
+      "seed/answers/cash resume",
+      "double-click idempotence",
+      "animation lock",
+      "PNG save handler with canvas doubles",
+      "storage blocked and invalid save fallback"
+    ],
+    "limitation": "DOM/canvas test doubles; actual browser rendering and real PNG output remain unverified"
+  },
+  "browser": {
+    "status": "not_run",
+    "reason": "Local runtime connection disconnected; no browser tool available. Mobile rendering, actual PNG rasterization and external LINE navigation remain unverified."
+  }
+}

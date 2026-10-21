@@ -10,7 +10,7 @@
  if(s.cash>=400000&&s.reputation>=50&&s.customers>=28)l=2;
  if(s.cash>=650000&&s.reputation>=60&&profit>=0&&balance>=3.5&&s.customers>=35)l=3;
  if(s.cash>=900000&&s.reputation>=67&&profit>=50000&&balance>=4.4&&s.customers>=43)l=4;
- if(s.cash>=1200000&&s.reputation>=74&&profit>=90000&&balance>=5.2&&s.customers>=49)l=5;return l;}
+ if(s.cash>=1200000&&s.reputation>=70&&profit>=90000&&balance>=4.4&&s.customers>=46)l=5;return l;}
  function replay(answers,data,seed=DEFAULT_SEED){const s=initial();for(let i=0;i<data.questions.length;i++){
   const v=answers[i];if(!Number.isInteger(v)||v<0||v>3||s.gameOver)break;
   const q=data.questions[i],a=plan(q.axis,v),before={cash:s.cash,revenue:s.revenue,customers:s.customers,reputation:s.reputation,level:s.level},prior=s.abilities.slice(),reasons=[];
@@ -31,7 +31,7 @@
   if(e.id==='chain'&&prior[1]>=2){eventDemand=-1;reasons.push('得意なことが伝わっていたため、競合の影響を抑えられました。');}
   let fixed=165000,turnaround=0;
   // 追加の現金配布ではなく支出削減と紹介による回復。帳簿を崩さない。
-  if(before.cash<220000&&v<=1){fixed-=35000;turnaround=s.loyalty>=3&&prior[2]>=1.8?7:2;reasons.push('資金を守るため運営を縮小。固定費を3万5千円抑え、既存客への対応に集中しました。');}
+  if(before.cash<220000&&v<=1){s.fatigue=Math.min(s.fatigue,1);repDelta+=2;fixed-=35000;turnaround=s.loyalty>=3&&prior[2]>=1.8?7:2;reasons.push('資金を守るため運営を縮小。固定費を3万5千円抑え、既存客への対応に集中しました。');}
   const buffer=before.cash-a.cost;let effectiveness=1;
   if(buffer<150000){effectiveness=.7;reasons.push('投資後の手元資金が少なく、運営に余裕がなくなりました。');}
   const novelty=Math.max(0,i-3)*Math.max(0,2-prior[0]-prior[3]/3)*1.7;
@@ -55,6 +55,6 @@
   s.history.push({q:i,value:v,before,cash:s.cash,revenue:s.revenue,customers:s.customers,reputation:s.reputation,costs,materials,fixed,maintenance,investment,eventCost,profit,event:e,headline,reasons,level:s.level});
  }return s;}
  function success(s){return !s.gameOver&&s.history.length===12&&s.cash>=INITIAL_CASH&&s.totalProfit>=0&&s.reputation>=65&&s.customers>=32;}
- function verdict(s){return s.gameOver?'次の一手を見つけた挑戦者':success(s)?(s.rescued?'逆転を育てたサロン店主':'資金と信頼を育てたお店'):s.cash<220000?'次は資金の余裕を育てよう':s.reputation<65?'次は信頼とのバランスを育てよう':'工夫を重ねるお店';}
+ function verdict(s){return s.gameOver?'次の一手を見つけた挑戦者':s.rescued&&s.cash>=INITIAL_CASH?'危機から立て直したお店':success(s)?(s.rescued?'逆転を育てたサロン店主':'資金と信頼を育てたお店'):s.cash<220000?'次は資金の余裕を育てよう':s.reputation<65?'次は信頼とのバランスを育てよう':'工夫を重ねるお店';}
  r.QuestManagement={order,plan,approaches:D.styles,initial,replay,verdict,success,roll,building,INITIAL_CASH};
 })(typeof window==='undefined'?globalThis:window);
