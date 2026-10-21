@@ -28,3 +28,8 @@
 @media(max-width:600px){main{padding:20px 14px 32px}.card,.finished-shop{padding:20px 16px}.qcard h2{font-size:23px}.management-panel{padding:10px;gap:8px}.management-panel strong{font-size:20px}.shop-stage{padding:6px}.scene .level{position:static;display:inline-block;margin:6px 0 0}.growth-scene svg{margin-top:0}.option{padding:16px 13px}.type-caption{align-items:flex-start;flex-wrap:wrap}.type-caption h2{font-size:21px}.scene-caption{font-size:16px}.finished-shop .final-scene{margin-left:0;margin-right:0}.result-layout{gap:16px}.share-actions{display:grid;grid-template-columns:1fr}.actions{flex-direction:column}.actions .textbtn{text-align:center}.actions .primary{flex:auto}.qcard .axis-tag{font-size:16px}.topbar{padding:16px 14px}}
 
 .congrats{font-size:18px}.parts-collection h3,.next-action h3{font-size:20px}.event-banner .big,.reward .big{line-height:1.4}
+
+
+/* 減少理由と資金のつながりを、開かなくても読めるようにする。 */
+.decline-note{padding:14px;margin:14px 0;background:#f3e6da;border-left:4px solid #9b6f4f;border-radius:8px}.cash-ledger{padding:16px;margin:16px 0;background:#fffdf5;border:1px solid #cbd8c4;border-radius:10px}.answer-options{margin-top:18px}.answer-options>summary{font-size:18px;min-height:52px;color:#354b43}.answer-options .options{margin-top:12px}.answer-options:not([open]){background:#fffaf2;border:1px solid #c9d4c4;border-radius:10px;padding:5px 12px}.answer-options+ .management-report{margin-top:18px}
+.history-note{font-size:16px;line-height:1.8;padding:12px;border:1px solid #cbd8c4;border-radius:10px;background:#f5f6ec;margin:12px 0}

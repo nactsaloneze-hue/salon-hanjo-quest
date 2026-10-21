@@ -1,0 +1,19 @@
+{
+  "loss": {
+    "previousCash": 666500,
+    "revenue": 280000,
+    "costs": 292000,
+    "profit": -12000,
+    "cash": 654500
+  },
+  "declineButProfit": {
+    "customersBefore": 44,
+    "customers": 33,
+    "previousCash": 926000,
+    "revenue": 330000,
+    "costs": 299500,
+    "profit": 30500,
+    "cash": 956500,
+    "explanation": "顧客は前回より減りましたが、今回の売上が経費を上回ったため、黒字分だけ資金が増えました。"
+  }
+}
