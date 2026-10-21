@@ -1,0 +1,57 @@
+{
+  "fullFlows": 9,
+  "sampledPaths": 20000,
+  "levels": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "letterResults": [
+    {
+      "letter": "A",
+      "cash": 1650000,
+      "revenue": 490000,
+      "customers": 49,
+      "reputation": 75,
+      "level": 4
+    },
+    {
+      "letter": "B",
+      "cash": 982500,
+      "revenue": 460000,
+      "customers": 46,
+      "reputation": 75,
+      "level": 3
+    },
+    {
+      "letter": "C",
+      "cash": 1537500,
+      "revenue": 500000,
+      "customers": 50,
+      "reputation": 74,
+      "level": 3
+    },
+    {
+      "letter": "D",
+      "cash": 1030000,
+      "revenue": 550000,
+      "customers": 55,
+      "reputation": 74,
+      "level": 4
+    }
+  ],
+  "checks": [
+    "12 questions / original answers unchanged",
+    "accounting identity",
+    "position independent choice IDs",
+    "prior choices affect later results",
+    "all 5 buildings reachable",
+    "decline possible",
+    "repeat choice is idempotent",
+    "review edits replay finances",
+    "LINE URL preserved"
+  ],
+  "browser": "Not tested: Chrome launch failed in this environment; WebKit runtime unavailable."
+}
