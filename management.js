@@ -1,49 +1,60 @@
-/* 第1段階：既存12問に重ねる経営モデル。金額は円、顧客は今回の判断後の人数。
-   回答は元の選択肢ID(0..3)で保存。表示位置を計算に使わない。
-   同じ回答を押し直しても増殖せず、見直し時は全判断を時系列で再計算する。 */
-(function(root){'use strict';
- const orders=[[2,0,3,1],[1,3,0,2],[3,2,1,0],[0,2,1,3],[2,1,3,0],[1,0,2,3],[3,1,0,2],[0,3,2,1],[2,3,1,0],[1,2,0,3],[3,0,2,1],[0,1,3,2]];
- const approaches=[
-  {name:'小さく運営',cost:0,rep:-2,reach:-3,good:'整備費をかけず、手元資金を温存',bad:'情報不足で見つけてもらいにくく、評判も育ちにくい'},
-  {name:'手軽に広げる',cost:25000,rep:0,reach:7,good:'少額で新しい人に届きやすい',bad:'広く届く分、予約の準備が弱いと来店に結びつきにくい'},
-  {name:'絞って整える',cost:65000,rep:3,reach:3,good:'必要な情報を整え、信頼と来店の土台を作る',bad:'6.5万円の整備費と、更新の手間がかかる'},
-  {name:'丁寧に充実',cost:155000,rep:5,reach:5,good:'詳しい情報で評判と予約のしやすさを高める',bad:'15.5万円の整備費。維持費も増え、資金不足では効果が落ちる'}
- ];
- const axisCosts=['場所・道順の案内','来店理由・メニューの案内','店内・安心情報','発信内容の整理','予約の案内'];
- const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
- function order(q){return orders[q].slice();}
- function initial(){return {cash:650000,revenue:0,totalRevenue:0,totalProfit:0,customers:0,reputation:50,abilities:[0,0,0,0,0],outreach:0,history:[],level:1};}
- function replay(answers,data){const s=initial();data.questions.forEach((q,i)=>{
-  const v=answers[i];if(!Number.isInteger(v)||v<0||v>3)return;
-  const a=approaches[v],before={cash:s.cash,revenue:s.revenue,customers:s.customers,reputation:s.reputation,level:s.level},prior=s.abilities.slice(),reasons=[];
-  // 設備・情報は一度整えれば残る。似た投資を繰り返すほど増分効果は小さい。
-  const gain=Math.max(0,v-prior[q.axis]);s.abilities[q.axis]=Math.max(prior[q.axis],v);
-  s.outreach=Math.round(s.outreach*.6)+a.reach;
-  let effectiveness=1;if(s.cash<a.cost+150000){effectiveness=.65;reasons.push('資金の余裕が少なく、整備後の運用に手が回らず効果が小さくなりました。');}
-  const recognition=30+s.abilities[0]*4+s.abilities[1]*3+s.outreach;
-  const conversion=.55+s.abilities[4]*.1+prior[2]*.04;
-  if(q.axis===3&&prior[4]<2&&v>0)reasons.push('発信の反応は増えましたが、先に予約方法が整っていない分、来店を取りこぼしました。');
-  if(q.axis===4&&prior[0]+prior[1]+prior[2]>=5)reasons.push('これまでの地域情報・来店理由・信頼の積み重ねを、予約へつなげられました。');
-  if(gain===0&&v>=2)reasons.push('同じ軸をすでに整えているため、追加投資の効果は控えめでした。');
-  const desired=Math.round((recognition*conversion+(s.reputation-50)*.16+gain*2)*effectiveness);
-  // 小規模店舗の受入上限。集客し過ぎると対応の負荷が評判に影響。
-  s.customers=clamp(desired,8,60);const crowd=Math.max(0,desired-60);
-  const reputationChange=a.rep+(gain>0?1:0)-(crowd>5?3:0)-(s.cash<0?2:0);
-  s.reputation=clamp(s.reputation+reputationChange,5,100);
-  if(crowd>5)reasons.push('受入枠を超える来店希望で対応が混み合い、評判に負担がかかりました。');
-  const unitPrice=10000,materials=s.customers*2500,fixed=165000,maintenance=s.abilities.reduce((sum,x)=>sum+(x>=2?x*2500:0),0);
-  s.revenue=s.customers*unitPrice;const costs=materials+fixed+maintenance+a.cost,profit=s.revenue-costs;
-  s.cash+=profit;s.totalRevenue+=s.revenue;s.totalProfit+=profit;
-  reasons.unshift(axisCosts[q.axis]+'に'+a.cost.toLocaleString('ja-JP')+'円を使う「'+a.name+'」を選択。'+(gain>0?'この軸の情報が充実しました。':'今の土台を使って運営しました。'));
-  if(v===0)reasons.push('整備費を抑えた一方、情報不足で来店の機会と評判を育てにくくなりました。');
-  if(s.cash<150000)reasons.push('資金に注意。次の投資は来店につながる土台と費用を見比べましょう。');
-  const balance=Math.min(s.abilities[0]+s.abilities[1],s.abilities[2]+s.abilities[4]);
-  s.level=1;if(s.cash>=450000&&s.reputation>=48&&s.customers>=30)s.level=2;
-  if(s.cash>=650000&&s.reputation>=58&&profit>=0&&balance>=3&&s.customers>=40)s.level=3;
-  if(s.cash>=850000&&s.reputation>=65&&profit>=50000&&balance>=4&&s.customers>=48)s.level=4;
-  if(s.cash>=1100000&&s.reputation>=72&&profit>=100000&&balance>=5&&s.customers>=55)s.level=5;
-  s.history.push({q:i,value:v,before,cash:s.cash,revenue:s.revenue,customers:s.customers,reputation:s.reputation,costs,materials,fixed,maintenance,investment:a.cost,profit,reasons,level:s.level});
- });return s;}
- function verdict(s){return s.cash>=650000&&s.totalProfit>=0&&s.reputation>=60?'資金と信頼を育てたお店':s.cash<150000?'次は資金の余裕を育てよう':s.reputation<50?'次は信頼とのバランスを育てよう':'工夫を重ねるお店';}
- root.QuestManagement={order,approaches,initial,replay,verdict};
+/* 経営モデルv2。原選択肢IDで計算。乱数はプレイの種から固定し、
+   再選択・戻る・回答変更でも同じ問いのくじを引き直さない。 */
+(function(r){'use strict';const D=r.QuestManagementData,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+ const INITIAL_CASH=650000,DEFAULT_SEED=12345;
+ function roll(seed,q,salt=0){let x=((seed>>>0)^Math.imul(q+1,2654435761)^Math.imul(salt+1,2246822519))>>>0;x^=x>>>16;x=Math.imul(x,2146121005);x^=x>>>15;x=Math.imul(x,2221713035);x^=x>>>16;return (x>>>0)/4294967296;}
+ function order(q,seed=DEFAULT_SEED){const a=[0,1,2,3];for(let i=3;i>0;i--){const j=Math.floor(roll(seed,q,i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+ function plan(axis,v){return {...D.styles[v],title:D.titles[axis][v]};}
+ function initial(){return {cash:INITIAL_CASH,revenue:0,totalRevenue:0,totalProfit:0,customers:0,reputation:55,abilities:[1,1,1,1,1],outreach:0,loyalty:0,fatigue:0,upkeep:0,history:[],level:1,gameOver:false,rescued:false};}
+ function building(s,profit){const balance=Math.min(s.abilities[0]+s.abilities[1],s.abilities[2]+s.abilities[4]);let l=1;
+ if(s.cash>=400000&&s.reputation>=50&&s.customers>=28)l=2;
+ if(s.cash>=650000&&s.reputation>=60&&profit>=0&&balance>=3.5&&s.customers>=35)l=3;
+ if(s.cash>=900000&&s.reputation>=67&&profit>=50000&&balance>=4.4&&s.customers>=43)l=4;
+ if(s.cash>=1200000&&s.reputation>=74&&profit>=90000&&balance>=5.2&&s.customers>=49)l=5;return l;}
+ function replay(answers,data,seed=DEFAULT_SEED){const s=initial();for(let i=0;i<data.questions.length;i++){
+  const v=answers[i];if(!Number.isInteger(v)||v<0||v>3||s.gameOver)break;
+  const q=data.questions[i],a=plan(q.axis,v),before={cash:s.cash,revenue:s.revenue,customers:s.customers,reputation:s.reputation,level:s.level},prior=s.abilities.slice(),reasons=[];
+  const e={...D.events[Math.floor(roll(seed,i,20)*D.events.length)]};
+  // 得意分野への追加投資は逓減。弱い軸に絞る判断ほど効果がある。
+  const gain=a.gain/(1+Math.max(0,prior[q.axis]-1)*.8);s.abilities[q.axis]=clamp(prior[q.axis]+gain,1,4);
+  const readiness=(prior[1]+prior[2]+prior[4])/3;
+  let reach=a.reach,repDelta=a.rep;
+  if(v===3){s.upkeep+=3500;if(readiness<1.65){reach*=.35;repDelta-=2;reasons.push('信頼・来店理由・予約の準備が足りず、大きな投資を来店につなげきれませんでした。');}else{reach*=1.15;reasons.push('先に整えた信頼と予約の流れが、大きな告知を支えました。');}
+   if(prior[q.axis]>2.4){reach*=.5;reasons.push('同じ分野への投資が重なり、新しく届く人は少なめでした。');}}
+  if(v===1&&(prior[4]<1.8||prior[2]<1.8)){reach*=.5;repDelta-=1;reasons.push('小さく試せましたが、予約方法がわかりにくく来店を一部取りこぼしました。');}
+  if(v===2&&prior[q.axis]<1.8){repDelta+=1;reasons.push('弱かった部分に絞った改善が、次の施策を支える土台になりました。');}
+  s.loyalty=clamp(s.loyalty+a.loyalty,0,8);s.outreach=Math.round(s.outreach*.4+reach);
+  if(v===0)s.fatigue=Math.max(0,s.fatigue-1);else if(v===3)s.fatigue+=1;else if(v===2){s.fatigue+=.8;if(s.fatigue>=3)reasons.push('改善作業が続いて受入枠が少なめに。運営に集中する時間も作りましょう。');}
+  let eventDemand=e.demand;
+  if(e.id==='rain')eventDemand+=Math.min(3,Math.floor(s.loyalty/2));
+  if(e.id==='referral'){eventDemand=s.reputation>=62&&s.loyalty>=3?8:1;reasons.push(eventDemand===8?'積み重ねた気配りから紹介が広がりました。':'紹介の芽がひとつ。信頼を育てると、さらに広がります。');}
+  if(e.id==='chain'&&prior[1]>=2){eventDemand=-1;reasons.push('得意なことが伝わっていたため、競合の影響を抑えられました。');}
+  let fixed=165000,turnaround=0;
+  // 追加の現金配布ではなく支出削減と紹介による回復。帳簿を崩さない。
+  if(before.cash<220000&&v<=1){fixed-=35000;turnaround=s.loyalty>=3&&prior[2]>=1.8?7:2;reasons.push('資金を守るため運営を縮小。固定費を3万5千円抑え、既存客への対応に集中しました。');}
+  const buffer=before.cash-a.cost;let effectiveness=1;
+  if(buffer<150000){effectiveness=.7;reasons.push('投資後の手元資金が少なく、運営に余裕がなくなりました。');}
+  const novelty=Math.max(0,i-3)*Math.max(0,2-prior[0]-prior[3]/3)*1.7;
+  const recognition=25+s.abilities[0]*3+s.abilities[1]*2+s.outreach+s.loyalty*.65-novelty;
+  const conversion=clamp(.65+s.abilities[4]*.08+prior[2]*.05,.7,1.08);
+  const desired=Math.max(6,Math.round((recognition*conversion+(s.reputation-55)*.18+eventDemand+turnaround)*effectiveness));
+  const capacity=Math.max(28,52+(a.slots||0)-Math.floor(s.fatigue)*2);
+  s.customers=Math.min(desired,capacity);const overflow=Math.max(0,desired-capacity);
+  if(overflow>3){s.fatigue+=2;repDelta-=Math.min(6,Math.ceil(overflow/3));reasons.push('告知に対応が追いつかず、お待たせしたお客様が離れてしまいました。');}
+  else if(v<=1&&s.customers<=capacity-3){repDelta+=1;s.fatigue=Math.max(0,s.fatigue-.5);}
+  if(s.fatigue>=5){repDelta-=3;reasons.push('忙しさの積み重ねが接客に影響。投資を休める判断も有効です。');}
+  if(v===0&&prior[0]+prior[3]<3&&i>=4){repDelta-=2;reasons.push('常連さんには届く一方、新しい方への案内が不足。小さな発信も組み合わせましょう。');}
+  s.reputation=clamp(Math.round(s.reputation+repDelta),5,100);
+  const materials=s.customers*2500,maintenance=Math.round(s.upkeep),investment=a.cost,eventCost=e.cost,costs=materials+fixed+maintenance+investment+eventCost;
+  s.revenue=s.customers*10000;const profit=s.revenue-costs;s.cash+=profit;s.totalRevenue+=s.revenue;s.totalProfit+=profit;
+  if(before.cash<220000&&s.cash>=220000){s.rescued=true;reasons.unshift('立て直し成功！支出を絞り、積み重ねた信頼で資金の余裕を取り戻しました。');}
+  if(before.cash>=220000&&s.cash<220000)reasons.unshift('資金が少なくなりました。次は支出を抑え、土台を活かす手もあります。');
+  s.gameOver=s.cash<=0;s.level=s.gameOver?1:building(s,profit);
+  if(s.gameOver)reasons.unshift('運転資金が尽きたため、今回の経営はここで終了です。次は違う判断で再挑戦できます。');
+  const headline=s.gameOver?'運転資金が尽きました':s.rescued&&before.cash<220000&&s.cash>=220000?'ピンチから立て直しました':profit<0?'今回は赤字。次の一手を考えよう':profit>=90000?'判断が実り、利益が育ちました':'小さな一歩が実りました';
+  s.history.push({q:i,value:v,before,cash:s.cash,revenue:s.revenue,customers:s.customers,reputation:s.reputation,costs,materials,fixed,maintenance,investment,eventCost,profit,event:e,headline,reasons,level:s.level});
+ }return s;}
+ function success(s){return !s.gameOver&&s.history.length===12&&s.cash>=INITIAL_CASH&&s.totalProfit>=0&&s.reputation>=65&&s.customers>=32;}
+ function verdict(s){return s.gameOver?'次の一手を見つけた挑戦者':success(s)?(s.rescued?'逆転を育てたサロン店主':'資金と信頼を育てたお店'):s.cash<220000?'次は資金の余裕を育てよう':s.reputation<65?'次は信頼とのバランスを育てよう':'工夫を重ねるお店';}
+ r.QuestManagement={order,plan,approaches:D.styles,initial,replay,verdict,success,roll,building,INITIAL_CASH};
 })(typeof window==='undefined'?globalThis:window);
