@@ -13,3 +13,4 @@
  }
  root.QuestLogic={diagnose};
 })(typeof window==='undefined'?globalThis:window);
+
