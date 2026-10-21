@@ -11,3 +11,11 @@
 @keyframes open-door{0%{transform:scaleX(1)}45%,85%{transform:scaleX(.35)}100%{transform:scaleX(.8)}}
 @media(max-width:600px){.finished-shop{padding:23px 14px 20px}.shop-stage{padding:3px 6px 10px}.growth-scene .level{font-size:10px;top:4px;padding:2px 8px}.growth-feedback{font-size:12px;margin-top:7px}.live-summary{gap:8px;font-size:11px}.finished-shop .scene-caption{font-size:10px}.parts-tags span{font-size:10px}.type-caption{gap:10px}.type-caption h2{font-size:17px}}
 @media(prefers-reduced-motion:reduce){.part-pop,.flower-bloom,.float-heart,.shine,.walk-arrive,.enter-shop,.door-open{animation:none!important}.enter-shop{opacity:.35}}
+
+/* 五段階の建物成長。基準点を地面にそろえて増築。 */
+.building-title{margin:15px auto 4px;max-width:450px}.stage-seal{display:inline-block;padding:2px 11px;background:#627e59;color:#fff9e9;border-radius:20px;font-size:13px;letter-spacing:.03em;margin-right:8px}.building-title strong{font-size:19px;font-family:serif;color:#516c49}.building-title p{font-size:12px;color:#6d7e61;margin:8px auto 0;max-width:350px;line-height:1.7}.stage-note{text-align:center;margin-top:-4px}.building-evolve{animation:building-grow 1.15s cubic-bezier(.21,.74,.23,1) both;transform-box:view-box}.building-shimmer:not(.building-evolve){animation:building-light .85s ease both}.building-aura{animation:aura-fade 1.15s ease both}.final-scene .building-shell{filter:drop-shadow(0 5px 4px #8d9e761a)}
+@keyframes building-grow{0%{opacity:.35;transform:translateY(9px) scale(.86)}55%{opacity:1;transform:translateY(-3px) scale(1.025)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes building-light{0%{opacity:.65}55%{opacity:1;filter:brightness(1.12)}100%{opacity:1;filter:brightness(1)}}
+@keyframes aura-fade{0%{opacity:0}40%{opacity:.5}100%{opacity:0}}
+@media(max-width:600px){.building-title strong{font-size:17px}.building-title p{font-size:12px}.finished-shop .final-scene{margin-left:-12px;margin-right:-12px}.stage-note{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.building-evolve,.building-shimmer,.building-aura{animation:none!important}.building-aura{display:none}}
